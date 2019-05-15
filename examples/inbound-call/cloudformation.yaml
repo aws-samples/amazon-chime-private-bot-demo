@@ -1,0 +1,64 @@
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Chime private bot demo to forward Amazon connect call to Chime
+Resources:
+  InboundLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: root
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+      - PolicyName: ChimeReadOnly
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - chime:ListAccounts
+            - chime:ListUsers
+            Resource: "*"
+
+  AMAZON_CHIME_INBOUND_CALL_LAMBDA_FUNCTION_NAME:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: AMAZON_CHIME_INBOUND_CALL_LAMBDA_FUNCTION_NAME
+      Description: Example lambda to forward inbound call
+      CodeUri: ./
+      Handler: index.handler
+      MemorySize: 256
+      Role: !GetAtt InboundLambdaExecutionRole.Arn
+      Runtime: nodejs8.10
+      Timeout: 30
+      Environment:
+        Variables:
+          IncomingWebhook: AMAZON_CHIME_INBOUND_CALL_LAMBDA_BOT_INCOMING_WEBHOOK
+          Email: AMAZON_CHIME_INBOUND_CALL_LAMBDA_USER_EMAIL
+
+  AllowInvokeByConnect:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName:
+        Ref: AMAZON_CHIME_INBOUND_CALL_LAMBDA_FUNCTION_NAME
+      Principal: 'connect.amazonaws.com'
+      SourceAccount: 'YOUR_ACCOUNT_ID'
+      SourceArn: AMAZON_CHIME_INBOUND_CALL_CONNECT_ARN
