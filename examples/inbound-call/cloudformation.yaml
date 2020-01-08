@@ -46,7 +46,7 @@ Resources:
       Handler: index.handler
       MemorySize: 256
       Role: !GetAtt InboundLambdaExecutionRole.Arn
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
       Environment:
         Variables:

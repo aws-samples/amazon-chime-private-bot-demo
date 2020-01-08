@@ -61,5 +61,5 @@ Resources:
       Handler: index.handler
       MemorySize: 256
       Role: !GetAtt PrivateBotLambdaExecutionRole.Arn
-      Runtime: nodejs8.10
+      Runtime: nodejs10.x
       Timeout: 30
