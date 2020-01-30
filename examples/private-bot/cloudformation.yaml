@@ -11,7 +11,7 @@ Resources:
       DefinitionUri: ./simple-proxy-api.yaml
       StageName: Demo
       Variables:
-        PrivateBotLambdaFuncionName: !Ref AMAZON_CHIME_PRIVATE_BOT_LAMBDA_FUNCTION_NAME
+        PrivateBotLambdaFunctionName: !Ref AMAZON_CHIME_PRIVATE_BOT_LAMBDA_FUNCTION_NAME
 
   PrivateBotLambdaExecutionRole:
     Type: AWS::IAM::Role
@@ -61,5 +61,5 @@ Resources:
       Handler: index.handler
       MemorySize: 256
       Role: !GetAtt PrivateBotLambdaExecutionRole.Arn
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Timeout: 30
